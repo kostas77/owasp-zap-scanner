@@ -23,9 +23,9 @@ pipeline {
         stage('Setting up OWASP ZAP Docker container') {
             steps {
                 script {
-                    // Check if the container already exists and running
-                    def containerExists = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
-                    if (!containerExists) {
+                    // Check if the container already exists and is running
+                    def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
+                    if (!containerRunning) {
                         // Pull the latest image and start the container
                         sh 'docker pull owasp/zap2docker-stable:latest'
                         sh 'docker run -dt --name owasp owasp/zap2docker-stable /bin/bash'
@@ -37,18 +37,13 @@ pipeline {
         }
 
         stage('Preparing the Working Directory') {
-            when {
-                expression {
-                    params.GENERATE_REPORT == true
-                }
-            }
             steps {
                 script {
                     // Check if the container is running
                     def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
                     if (containerRunning) {
                         // Create the working directory
-                        sh 'docker exec owasp mkdir /zap/wrk'
+                        sh 'docker exec owasp mkdir -p /zap/wrk'
                     } else {
                         echo 'OWASP ZAP Docker container is not running.'
                     }
