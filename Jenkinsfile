@@ -69,8 +69,8 @@ pipeline {
         stage('Scanning target on OWASP container') {
             steps {
                 script {
-                    def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
-                    if (containerRunning) {
+                    def containerOutput = sh(script: 'docker ps -q -f name=owasp', returnStdout: true).trim()
+                    if (containerOutput) {
                         // Perform the OWASP ZAP Baseline scan
                         try {
                             sh 'docker exec owasp zap-baseline.py -t https://medium.com/ -r report.html -I'
