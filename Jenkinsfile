@@ -30,6 +30,7 @@ pipeline {
                         sh 'docker pull owasp/zap2docker-stable:latest'
                         sh 'docker run -dt --name owasp owasp/zap2docker-stable /bin/bash'
                         // Introduce a delay to allow the container to start
+                        sh 'docker ps -q -f name=owasp'
                         sleep time: 10, unit: 'SECONDS'
                     } else {
                         echo 'OWASP ZAP Docker container already running.'
