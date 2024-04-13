@@ -99,8 +99,7 @@ pipeline {
                             sh "docker start $containerId"
                             sh 'docker ps -a'
                             sh 'docker ps -aq -f name=owasp'
-                            sh "docker run curl https://www.example.com"
-//                             sh "docker run -t owasp/zap2docker-stable:latest curl https://www.example.com"
+                            sh "docker run -t owasp/zap2docker-stable:latest curl https://www.example.com"
 //                             sh "docker exec $containerId zap-baseline.py -t https://medium.com/ -r report.html -I"
 //                         } catch (Exception e) {
 //                             echo "Failed to perform OWASP ZAP Baseline scan: ${e.message}"
