@@ -32,8 +32,8 @@ pipeline {
                         sh 'docker pull owasp/zap2docker-stable:latest'
                         sh 'docker run -dt --name owasp owasp/zap2docker-stable /bin/bash'
                         // Introduce a delay to allow the container to start
-                        sh 'docker ps -q -f name=owasp'
-                        sleep time: 10, unit: 'SECONDS'
+                        sleep time: 5, unit: 'SECONDS'
+                        sh 'docker ps -aq -f name=owasp'
                     }
                 }
             }
@@ -69,7 +69,7 @@ pipeline {
         stage('Scanning target on OWASP container') {
             steps {
                 script {
-                    def containerOutput = sh(script: 'docker ps -q -f name=owasp', returnStdout: true).trim()
+                    def containerOutput = sh(script: 'docker ps -aq -f name=owasp', returnStdout: true).trim()
                     if (containerOutput) {
                         // Perform the OWASP ZAP Baseline scan
                         try {
