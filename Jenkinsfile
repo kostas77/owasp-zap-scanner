@@ -54,7 +54,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Scanning target on owasp container') {
             when {
                 expression {
@@ -121,10 +121,14 @@ pipeline {
                 def containerExists = sh(script: 'docker ps -aq -f name=owasp', returnStatus: true) == 0
                 if (containerExists) {
                     // Stop and remove the container
-                    sh '''
-                         docker stop owasp
-                         docker rm owasp
-                     '''
+                    try {
+                        sh '''
+                             docker stop owasp
+                             docker rm owasp
+                         '''
+                    } catch (Exception e) {
+                        echo "Failed to stop and remove container: ${e.message}"
+                    }
                 } else {
                     echo 'OWASP ZAP Docker container does not exist.'
                 }
