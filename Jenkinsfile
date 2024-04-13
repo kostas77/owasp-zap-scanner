@@ -28,9 +28,9 @@ pipeline {
 //                     if (!containerRunning) {
                         // Pull the latest image and start the container
                         sh 'docker pull owasp/zap2docker-stable:latest'
-                        sh 'docker run -dt --name owasp owasp/zap2docker-stable /bin/bash'
+                        sh 'docker run --platform linux/amd64/v3 -dt --name owasp owasp/zap2docker-stable /bin/bash'
                         // Introduce a delay to allow the container to start
-                        sleep time: 30, unit: 'SECONDS'
+                        sleep time: 10, unit: 'SECONDS'
 //                     } else {
 //                         echo 'OWASP ZAP Docker container already running.'
 //                     }
