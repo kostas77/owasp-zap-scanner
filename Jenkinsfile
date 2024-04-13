@@ -117,11 +117,19 @@ pipeline {
 
     post {
         always {
-            echo 'Removing container'
-            sh '''
-                 docker stop owasp
-                 docker rm owasp
-             '''
+            script {
+                // Check if the container exists
+                def containerExists = sh(script: 'docker ps -aq -f name=owasp', returnStatus: true) == 0
+                if (containerExists) {
+                    // Stop and remove the container
+                    sh '''
+                         docker stop owasp
+                         docker rm owasp
+                     '''
+                } else {
+                    echo 'OWASP ZAP Docker container does not exist.'
+                }
+            }
             cleanWs()
         }
     }
