@@ -69,6 +69,29 @@ pipeline {
         stage('Scanning target on OWASP container') {
             steps {
                 script {
+                    def containerId = sh(script: 'docker ps -aq -f name=owasp', returnStdout: true).trim()
+                    if (containerId) {
+                        // Check if the container is running
+                        def isRunning = sh(script: "docker inspect --format='{{.State.Running}}' $containerId", returnStdout: true).trim()
+                        if (isRunning == 'true') {
+                            // Container is running, execute commands inside it
+                            try {
+                                sh 'docker ps -a'
+                                sh 'docker ps -aq -f name=owasp'
+                                sh "docker start $containerId"
+//                                 sh 'docker exec owasp zap-baseline.py -t https://medium.com/ -r report.html -I'
+                                sh "docker exec $containerId zap-baseline.py -t https://medium.com/ -r report.html -I"
+                            } catch (Exception e) {
+                                echo "Failed to perform OWASP ZAP Baseline scan: ${e.message}"
+                            }
+                        } else {
+                            // Start the container if it's not running
+                            sh "docker start $containerId"
+                            echo "Started OWASP ZAP Docker container."
+                        }
+                    } else {
+                        echo "OWASP ZAP Docker container does not exist."
+                    }
 //                     def containerOutput = sh(script: 'docker ps -aq -f name=owasp', returnStdout: true).trim()
 //                     if (containerOutput) {
 //                         // Perform the OWASP ZAP Baseline scan
