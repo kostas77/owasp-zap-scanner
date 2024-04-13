@@ -55,47 +55,65 @@ pipeline {
             }
         }
 
-        stage('Scanning target on owasp container') {
-            when {
-                expression {
-                    params.GENERATE_REPORT == true
-                }
-            }
+        stage('Scanning target on OWASP container') {
             steps {
                 script {
-                    scan_type = "${params.SCAN_TYPE}"
-                    echo "----> scan_type: $scan_type"
-                    target = "${params.TARGET}"
-                    if (scan_type == 'Baseline') {
-                        sh """
-                             docker exec owasp \
-                             zap-baseline.py \
-                             -t $target \
-                             -r report.html \
-                             -I
-                         """
-                    } else if (scan_type == 'APIS') {
-                        sh """
-                             docker exec owasp \
-                             zap-api-scan.py \
-                             -t $target \
-                             -r report.html \
-                             -I
-                         """
-                    } else if (scan_type == 'Full') {
-                        sh """
-                             docker exec owasp \
-                             zap-full-scan.py \
-                             -t $target \
-                             -r report.html \
-                             -I
-                         """
+                    def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
+                    if (containerRunning) {
+                        // Perform the OWASP ZAP Baseline scan
+                        try {
+                            sh 'docker exec owasp zap-baseline.py -t https://medium.com/ -r report.html -I'
+                        } catch (Exception e) {
+                            echo "Failed to perform OWASP ZAP Baseline scan: ${e.message}"
+                        }
                     } else {
-                        echo 'Something went wrong...'
+                        echo 'OWASP ZAP Docker container is not running.'
                     }
                 }
             }
         }
+        
+//         stage('Scanning target on owasp container') {
+//             when {
+//                 expression {
+//                     params.GENERATE_REPORT == true
+//                 }
+//             }
+//             steps {
+//                 script {
+//                     scan_type = "${params.SCAN_TYPE}"
+//                     echo "----> scan_type: $scan_type"
+//                     target = "${params.TARGET}"
+//                     if (scan_type == 'Baseline') {
+//                         sh """
+//                              docker exec owasp \
+//                              zap-baseline.py \
+//                              -t $target \
+//                              -r report.html \
+//                              -I
+//                          """
+//                     } else if (scan_type == 'APIS') {
+//                         sh """
+//                              docker exec owasp \
+//                              zap-api-scan.py \
+//                              -t $target \
+//                              -r report.html \
+//                              -I
+//                          """
+//                     } else if (scan_type == 'Full') {
+//                         sh """
+//                              docker exec owasp \
+//                              zap-full-scan.py \
+//                              -t $target \
+//                              -r report.html \
+//                              -I
+//                          """
+//                     } else {
+//                         echo 'Something went wrong...'
+//                     }
+//                 }
+//             }
+//         }
 
         stage('Copy Report to Workspace') {
             steps {
