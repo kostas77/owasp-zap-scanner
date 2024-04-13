@@ -24,14 +24,14 @@ pipeline {
             steps {
                 script {
                     // Check if the container already exists and is running
-                    def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
-                    if (!containerRunning) {
+//                     def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
+//                     if (!containerRunning) {
                         // Pull the latest image and start the container
                         sh 'docker pull owasp/zap2docker-stable:latest'
                         sh 'docker run -dt --name owasp owasp/zap2docker-stable /bin/bash'
-                    } else {
-                        echo 'OWASP ZAP Docker container already running.'
-                    }
+//                     } else {
+//                         echo 'OWASP ZAP Docker container already running.'
+//                     }
                 }
             }
         }
@@ -72,7 +72,7 @@ pipeline {
                 }
             }
         }
-        
+
 //         stage('Scanning target on owasp container') {
 //             when {
 //                 expression {
