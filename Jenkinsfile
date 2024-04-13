@@ -43,14 +43,18 @@ pipeline {
                     def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
                     if (containerRunning) {
                         // Create the working directory
-                        sh 'docker exec owasp mkdir -p /zap/wrk'
+                        try {
+                            sh 'docker exec owasp mkdir -p /zap/wrk'
+                        } catch (Exception e) {
+                            echo "Failed to create working directory: ${e.message}"
+                        }
                     } else {
                         echo 'OWASP ZAP Docker container is not running.'
                     }
                 }
             }
         }
-
+        
         stage('Scanning target on owasp container') {
             when {
                 expression {
