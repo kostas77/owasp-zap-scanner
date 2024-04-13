@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     // Check if the container already exists and is running
-                    def containerOutput = sh(script: 'docker ps -q -f name=owasp', returnStdout: true).trim()
+                    def containerOutput = sh(script: 'docker ps -aq -f name=owasp', returnStdout: true).trim()
                     if (containerOutput) {
                         echo 'OWASP ZAP Docker container already running.'
                     } else {
@@ -43,7 +43,7 @@ pipeline {
 //             steps {
 //                 script {
 //                     // Check if the container is running
-//                     def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
+//                     def containerRunning = sh(script: 'docker ps -aq -f name=owasp', returnStatus: true) == 0
 //                     if (containerRunning) {
 //                         // Create the working directory
 //                         try {
