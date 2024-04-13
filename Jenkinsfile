@@ -147,8 +147,8 @@ pipeline {
         always {
             script {
                 // Check if the container exists
-                def containerExists = sh(script: 'docker ps -aq -f name=owasp', returnStatus: true) == 0
-                if (containerExists) {
+                def containerOutput = sh(script: 'docker ps -aq -f name=owasp', returnStdout: true).trim()
+                if (containerOutput) {
                     // Stop and remove the container
                     try {
                         sh '''
