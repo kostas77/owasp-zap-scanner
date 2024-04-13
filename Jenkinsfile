@@ -57,6 +57,14 @@ pipeline {
 //             }
 //         }
 
+        stage('Testing docker') {
+            steps {
+                script {
+                     sh 'docker ps -a'
+                }
+            }
+        }
+
         stage('Scanning target on OWASP container') {
             steps {
                 script {
