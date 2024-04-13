@@ -24,38 +24,38 @@ pipeline {
             steps {
                 script {
                     // Check if the container already exists and is running
-//                     def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
-//                     if (!containerRunning) {
+                    def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
+                    if (!containerRunning) {
                         // Pull the latest image and start the container
                         sh 'docker pull owasp/zap2docker-stable:latest'
-                        sh 'docker run --platform linux/amd64/v3 -dt --name owasp owasp/zap2docker-stable /bin/bash'
+                        sh 'docker run -dt --name owasp owasp/zap2docker-stable /bin/bash'
                         // Introduce a delay to allow the container to start
                         sleep time: 10, unit: 'SECONDS'
-//                     } else {
-//                         echo 'OWASP ZAP Docker container already running.'
-//                     }
+                    } else {
+                        echo 'OWASP ZAP Docker container already running.'
+                    }
                 }
             }
         }
 
-        stage('Preparing the Working Directory') {
-            steps {
-                script {
-                    // Check if the container is running
+//         stage('Preparing the Working Directory') {
+//             steps {
+//                 script {
+//                     // Check if the container is running
 //                     def containerRunning = sh(script: 'docker ps -q -f name=owasp', returnStatus: true) == 0
 //                     if (containerRunning) {
 //                         // Create the working directory
 //                         try {
-                            sh 'docker exec owasp mkdir -p /zap/wrk'
+//                             sh 'docker exec owasp mkdir -p /zap/wrk'
 //                         } catch (Exception e) {
 //                             echo "Failed to create working directory: ${e.message}"
 //                         }
 //                     } else {
 //                         echo 'OWASP ZAP Docker container is not running.'
 //                     }
-                }
-            }
-        }
+//                 }
+//             }
+//         }
 
         stage('Scanning target on OWASP container') {
             steps {
@@ -117,15 +117,15 @@ pipeline {
 //             }
 //         }
 
-        stage('Copy Report to Workspace') {
-            steps {
-                script {
-                    sh '''
-                         docker cp owasp:/zap/wrk/report.html ${WORKSPACE}/report.html
-                     '''
-                }
-            }
-        }
+//         stage('Copy Report to Workspace') {
+//             steps {
+//                 script {
+//                     sh '''
+//                          docker cp owasp:/zap/wrk/report.html ${WORKSPACE}/report.html
+//                      '''
+//                 }
+//             }
+//         }
 
 //         stage('Emailing the Report') {
 //             steps {
