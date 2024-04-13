@@ -73,6 +73,7 @@ pipeline {
                     if (containerOutput) {
                         // Perform the OWASP ZAP Baseline scan
                         try {
+                            sh 'docker ps -aq -f name=owasp'
                             sh 'docker exec owasp zap-baseline.py -t https://medium.com/ -r report.html -I'
                         } catch (Exception e) {
                             echo "Failed to perform OWASP ZAP Baseline scan: ${e.message}"
