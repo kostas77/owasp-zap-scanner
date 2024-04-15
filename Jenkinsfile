@@ -38,7 +38,7 @@ pipeline {
                                  (params.SCAN_TYPE == 'APIS' ? "zap-api-scan.py" : "zap-full-scan.py"))
 
                     sh """
-                       docker run --name zap -v ${PWD}:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable $scriptName -t $target $reportFlag
+                       docker run -v ${PWD}:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable $scriptName -t $target $reportFlag
                     """
                 }
             }
@@ -62,26 +62,26 @@ pipeline {
 //         }
     }
 
-    post {
-        always {
-            script {
-                // Check if the container exists
-                def containerOutput = sh(script: 'docker ps -aq -f name=owasp', returnStdout: true).trim()
-                if (containerOutput) {
-                    // Stop and remove the container
-                    try {
-                        sh '''
-                             docker stop owasp
-                             docker rm owasp
-                         '''
-                    } catch (Exception e) {
-                        echo "Failed to stop and remove container: ${e.message}"
-                    }
-                } else {
-                    echo 'OWASP ZAP Docker container does not exist.'
-                }
-            }
-            cleanWs()
-        }
-    }
+//     post {
+//         always {
+//             script {
+//                 // Check if the container exists
+//                 def containerOutput = sh(script: 'docker ps -aq', returnStdout: true).trim()
+//                 if (containerOutput) {
+//                     // Stop and remove the container
+//                     try {
+//                         sh '''
+//                              docker stop containerOutput
+//                              docker rm containerOutput
+//                          '''
+//                     } catch (Exception e) {
+//                         echo "Failed to stop and remove container: ${e.message}"
+//                     }
+//                 } else {
+//                     echo 'OWASP ZAP Docker container does not exist.'
+//                 }
+//             }
+//             cleanWs()
+//         }
+//     }
 }
