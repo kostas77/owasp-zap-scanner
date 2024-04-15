@@ -68,7 +68,7 @@ pipeline {
         stage('Scanning target on OWASP container') {
             steps {
                 script {
-                    sh "docker run --name zap -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://www.us.elsevierhealth.com/ -r report.html"
+                    sh 'docker run --name zap -v ${PWD}:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://www.us.elsevierhealth.com/ -r report.html'
                 }
             }
         }
