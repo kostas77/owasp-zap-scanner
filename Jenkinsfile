@@ -8,7 +8,7 @@ pipeline {
             name: 'SCAN_TYPE'
         )
         string(
-            defaultValue: 'https://medium.com/',
+            defaultValue: 'https://www.us.elsevierhealth.com/',
             description: 'Target URL to scan',
             name: 'TARGET'
         )
@@ -29,11 +29,10 @@ pipeline {
                         echo 'OWASP ZAP Docker container already running.'
                     } else {
                        // Pull the latest image and start the container
-                        sh 'docker pull owasp/zap2docker-stable:latest'
-                        sh 'docker run -dt --name owasp owasp/zap2docker-stable /bin/bash'
+                        sh 'docker pull ghcr.io/zaproxy/zaproxy:stable'
+                        sh 'docker run -dt --name ghcr.io/zaproxy/zaproxy:stable /bin/bash'
                         // Introduce a delay to allow the container to start
                         sleep time: 5, unit: 'SECONDS'
-                        sh 'docker ps -aq -f name=owasp'
                     }
                 }
             }
@@ -69,44 +68,7 @@ pipeline {
         stage('Scanning target on OWASP container') {
             steps {
                 script {
-                    def containerId = sh(script: 'docker ps -aq -f name=owasp', returnStdout: true).trim()
-                    if (containerId) {
-                        // Check if the container is running
-                        def isRunning = sh(script: "docker inspect --format='{{.State.Running}}' $containerId", returnStdout: true).trim()
-                        if (isRunning == 'true') {
-                            // Container is running, execute commands inside it
-                            try {
-                                sh 'docker ps -a'
-                                sh 'docker ps -aq -f name=owasp'
-                                sh "docker start $containerId"
-//                                 sh 'docker exec owasp zap-baseline.py -t https://medium.com/ -r report.html -I'
-                                sh "docker exec $containerId zap-baseline.py -t https://medium.com/ -r report.html -I"
-                            } catch (Exception e) {
-                                echo "Failed to perform OWASP ZAP Baseline scan: ${e.message}"
-                            }
-                        } else {
-                            // Start the container if it's not running
-                            sh "docker start $containerId"
-                            echo "Started OWASP ZAP Docker container."
-                        }
-                    } else {
-                        echo "OWASP ZAP Docker container does not exist."
-                    }
-//                     def containerOutput = sh(script: 'docker ps -aq -f name=owasp', returnStdout: true).trim()
-//                     if (containerOutput) {
-//                         // Perform the OWASP ZAP Baseline scan
-//                         try {
-                            sh "docker start $containerId"
-                            sh 'docker ps -a'
-                            sh 'docker ps -aq -f name=owasp'
-                            sh "docker run -t owasp/zap2docker-stable:latest curl https://www.example.com"
-//                             sh "docker exec $containerId zap-baseline.py -t https://medium.com/ -r report.html -I"
-//                         } catch (Exception e) {
-//                             echo "Failed to perform OWASP ZAP Baseline scan: ${e.message}"
-//                         }
-//                     } else {
-//                         echo 'OWASP ZAP Docker container is not running.'
-//                     }
+                    sh "docker run --name zap -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://www.us.elsevierhealth.com/ -r report.html"
                 }
             }
         }
