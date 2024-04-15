@@ -25,45 +25,6 @@ pipeline {
                 script {
                     // Pulling the latest stable image of OWASP ZAP
                     sh 'docker pull ghcr.io/zaproxy/zaproxy:stable'
-                    // Ensuring the container is up and running with the necessary configurations
-                    sh """
-                       docker run --name owasp -d -p 8090:8090 \
-                       -v ${PWD}:/zap/wrk/:rw \
-                       --restart unless-stopped \
-                       ghcr.io/zaproxy/zaproxy:stable
-                    """
-                }
-            }
-        }
-
-        stage('Preparing the Working Directory') {
-            steps {
-                script {
-                    // Check if the OWASP ZAP container is running
-                    def containerRunning = sh(script: 'docker inspect -f {{.State.Running}} owasp', returnStdout: true).trim()
-                    if (containerRunning == 'true') {
-                        // Attempt to create the working directory inside the container
-                        try {
-                            sh 'docker exec owasp mkdir -p /zap/wrk'
-                            echo 'Working directory set up successfully.'
-                        } catch (Exception e) {
-                            echo "Failed to create working directory: ${e.message}"
-                            // Optionally, throw an error to halt the pipeline if critical
-                            error "Stopping the pipeline as the working directory setup failed."
-                        }
-                    } else {
-                        // Log and possibly handle if the container isn't running
-                        echo 'OWASP ZAP Docker container is not running. Attempting to start.'
-                        sh """
-                           docker run --name owasp -d -p 8090:8090 \
-                           -v ${PWD}:/zap/wrk/:rw \
-                           --restart unless-stopped \
-                           ghcr.io/zaproxy/zaproxy:stable
-                        """
-                        echo 'Container started. Please re-run the pipeline.'
-                        // Optionally, stop the pipeline to let the container fully initialize
-                        error "Container was not running and has been started. Please re-run the pipeline."
-                    }
                 }
             }
         }
@@ -89,16 +50,16 @@ pipeline {
 //             }
 //         }
 
-        stage('Copy Report to Workspace') {
-            when {
-                expression { return params.GENERATE_REPORT }
-            }
-            steps {
-                script {
-                    sh 'docker cp owasp:/zap/wrk/report.html ${WORKSPACE}/report.html'
-                }
-            }
-        }
+//         stage('Copy Report to Workspace') {
+//             when {
+//                 expression { return params.GENERATE_REPORT }
+//             }
+//             steps {
+//                 script {
+//                     sh 'docker cp owasp:/zap/wrk/report.html ${WORKSPACE}/report.html'
+//                 }
+//             }
+//         }
     }
 
     post {
