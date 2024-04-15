@@ -38,7 +38,7 @@ pipeline {
                                  (params.SCAN_TYPE == 'APIS' ? "zap-api-scan.py" : "zap-full-scan.py"))
 
                     sh """
-                       docker run -v ${PWD}:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable $scriptName -t $target $reportFlag
+                       docker run -v ${PWD}:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable $scriptName -t $target $reportFlag -I
                     """
                 }
             }
