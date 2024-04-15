@@ -30,9 +30,6 @@ pipeline {
                     } else {
                        // Pull the latest image and start the container
                         sh 'docker pull ghcr.io/zaproxy/zaproxy:stable'
-                        sh 'docker run -dt --name ghcr.io/zaproxy/zaproxy:stable /bin/bash'
-                        // Introduce a delay to allow the container to start
-                        sleep time: 5, unit: 'SECONDS'
                     }
                 }
             }
