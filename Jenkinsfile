@@ -50,16 +50,19 @@ pipeline {
 //             }
 //         }
 
-//         stage('Copy Report to Workspace') {
-//             when {
-//                 expression { return params.GENERATE_REPORT }
-//             }
-//             steps {
-//                 script {
-//                     sh 'docker cp owasp:/zap/wrk/report.html ${WORKSPACE}/report.html'
-//                 }
-//             }
-//         }
+        stage('Copy Report to Workspace') {
+            when {
+                expression { return params.GENERATE_REPORT }
+            }
+            steps {
+                script {
+                    // Assuming the report is stored in the working directory
+                    // Copy report to the workspace
+                    sh "cp ${PWD}/report.html ${WORKSPACE}/report.html"
+                }
+            }
+        }
+
     }
 
 //     post {
